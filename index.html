@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SmartSpend</title>
+<link rel="stylesheet" href="style.css">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+<header>
+    <h1>SmartSpend</h1>
+    <p>Privacy-First Financial Intelligence</p>
+</header>
+
+<div class="container">
+
+    <div class="card">
+        <h2>Add Expense</h2>
+        <input type="text" id="desc" placeholder="Description">
+        <input type="number" id="amount" placeholder="Amount ₹">
+        <button onclick="addExpense()">Add</button>
+    </div>
+
+    <div class="card">
+        <h2>Monthly Overview</h2>
+        <p>Total Spend: ₹<span id="total">0</span></p>
+        <p>Burn Rate: ₹<span id="burnRate">0</span>/day</p>
+        <p>Exhaustion Date: <span id="exhaustion">-</span></p>
+    </div>
+
+    <div class="card">
+        <h2>Expenses</h2>
+        <ul id="expenseList"></ul>
+    </div>
+
+    <div class="card">
+        <h2>Debt Simplifier</h2>
+        <input type="text" id="from" placeholder="From">
+        <input type="text" id="to" placeholder="To">
+        <input type="number" id="debtAmount" placeholder="Amount ₹">
+        <button onclick="addDebt()">Add Debt</button>
+        <ul id="debtList"></ul>
+        <button onclick="simplifyDebts()">Simplify</button>
+        <p id="simplifiedResult"></p>
+    </div>
+
+    <div class="card">
+        <h2>Spending Chart</h2>
+        <canvas id="chart"></canvas>
+    </div>
+
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
