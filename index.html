@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -5,15 +6,13 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SmartSpend AI</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<style>
 
+<style>
 :root{
+--accent:#38bdf8;
+--glass:rgba(255,255,255,0.06);
 --bg:#0f172a;
 --card:#1e293b;
---accent:#38bdf8;
---green:#22c55e;
---red:#ef4444;
---glass:rgba(255,255,255,0.05);
 }
 
 *{
@@ -26,39 +25,34 @@ font-family:Inter, sans-serif;
 body{
 background:linear-gradient(135deg,#0f172a,#020617);
 color:white;
-padding:30px;
+padding:40px;
 }
 
 h1{
-font-size:32px;
 color:var(--accent);
+margin-bottom:10px;
 }
 
 .container{
 display:grid;
-grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
-gap:20px;
+grid-template-columns:repeat(auto-fit,minmax(330px,1fr));
+gap:25px;
 margin-top:30px;
 }
 
 .card{
 background:var(--glass);
-backdrop-filter:blur(15px);
-padding:20px;
+backdrop-filter:blur(20px);
+padding:25px;
 border-radius:20px;
-box-shadow:0 8px 25px rgba(0,0,0,0.3);
-transition:0.3s;
-}
-
-.card:hover{
-transform:translateY(-5px);
+box-shadow:0 10px 30px rgba(0,0,0,0.4);
 }
 
 input,select{
 width:100%;
-padding:10px;
-margin-bottom:10px;
-border-radius:10px;
+padding:12px;
+margin-bottom:12px;
+border-radius:12px;
 border:none;
 background:#1e293b;
 color:white;
@@ -66,22 +60,13 @@ color:white;
 
 button{
 width:100%;
-padding:10px;
+padding:12px;
 border:none;
-border-radius:10px;
+border-radius:12px;
 background:var(--accent);
-color:black;
 font-weight:bold;
 cursor:pointer;
 }
-
-.kpi{
-font-size:22px;
-margin:10px 0;
-}
-
-.green{color:var(--green);}
-.red{color:var(--red);}
 
 ul{
 list-style:none;
@@ -97,13 +82,13 @@ border-bottom:1px solid rgba(255,255,255,0.1);
 canvas{
 margin-top:15px;
 }
-
 </style>
 </head>
+
 <body>
 
 <h1>SmartSpend AI Dashboard</h1>
-<p>Predict. Optimize. Simplify.</p>
+<p>Predict • Optimize • Simplify</p>
 
 <div class="container">
 
@@ -125,14 +110,14 @@ margin-top:15px;
 <h2>Set Monthly Budget</h2>
 <input id="budgetInput" type="number" placeholder="Enter Budget ₹">
 <button onclick="setBudget()">Save Budget</button>
-<p class="kpi">Budget: ₹<span id="budget">0</span></p>
+<p>Budget: ₹<span id="budget">0</span></p>
 </div>
 
 <div class="card">
 <h2>Financial Intelligence</h2>
-<p class="kpi">Total Spend: ₹<span id="total">0</span></p>
-<p class="kpi">Burn Rate: ₹<span id="burn">0</span>/day</p>
-<p class="kpi">Exhaustion Date: <span id="exhaust"></span></p>
+<p>Total Spend: ₹<span id="total">0</span></p>
+<p>Burn Rate: ₹<span id="burn">0</span>/day</p>
+<p>Exhaustion Date: <span id="exhaust">-</span></p>
 </div>
 
 <div class="card">
@@ -166,7 +151,7 @@ margin-top:15px;
 <script>
 
 let expenses = JSON.parse(localStorage.getItem("expenses")) || [];
-let budget = localStorage.getItem("budget") || 0;
+let budget = parseFloat(localStorage.getItem("budget")) || 0;
 let debts = [];
 
 document.getElementById("budget").innerText = budget;
@@ -177,55 +162,52 @@ localStorage.setItem("budget",budget);
 }
 
 function addExpense(){
-let desc = descInput.value;
-let amount = parseFloat(amountInput.value);
-let category = categoryInput.value;
+const desc=document.getElementById("desc").value;
+const amount=parseFloat(document.getElementById("amount").value);
+const category=document.getElementById("category").value;
 
-if(!desc || !amount) return;
+if(!desc || isNaN(amount)) return alert("Enter valid expense");
 
-expenses.push({
-desc,amount,category,
-date:new Date()
-});
-
+expenses.push({desc,amount,category,date:new Date()});
 save();
 render();
 }
 
 function setBudget(){
-budget = budgetInput.value;
+budget=parseFloat(document.getElementById("budgetInput").value);
+if(isNaN(budget)) return alert("Enter valid budget");
 save();
-document.getElementById("budget").innerText = budget;
 render();
 }
 
 function render(){
 
-let total = expenses.reduce((a,b)=>a+b.amount,0);
-totalSpan.innerText = total;
+let total=expenses.reduce((a,b)=>a+b.amount,0);
+document.getElementById("total").innerText=total.toFixed(2);
+document.getElementById("budget").innerText=budget;
 
-let today = new Date().getDate();
-let last7 = expenses.slice(-7);
-let weighted = 0;
-let weightSum = 0;
+let last7=expenses.slice(-7);
+let weighted=0, weightSum=0;
 
 last7.forEach((e,i)=>{
-let weight = i+1;
-weighted += e.amount * weight;
-weightSum += weight;
+let weight=i+1;
+weighted+=e.amount*weight;
+weightSum+=weight;
 });
 
-let burn = weighted/weightSum || 0;
-burnSpan.innerText = burn.toFixed(2);
+let burn=weightSum? weighted/weightSum:0;
+document.getElementById("burn").innerText=burn.toFixed(2);
 
-if(budget>0){
-let remaining = budget-total;
-let daysLeft = Math.floor(remaining/burn);
-let date = new Date();
+if(budget>0 && burn>0){
+let remaining=budget-total;
+let daysLeft=Math.floor(remaining/burn);
+let date=new Date();
 date.setDate(date.getDate()+daysLeft);
-exhaustSpan.innerText = daysLeft>0?date.toDateString():"Budget Exhausted";
+document.getElementById("exhaust").innerText=
+remaining>0?date.toDateString():"Budget Exhausted";
 }
 
+let list=document.getElementById("list");
 list.innerHTML="";
 expenses.forEach(e=>{
 let li=document.createElement("li");
@@ -240,17 +222,22 @@ let lineChart,pieChart;
 
 function updateCharts(){
 
-let ctx1=document.getElementById("lineChart");
-let ctx2=document.getElementById("pieChart");
-
 if(lineChart) lineChart.destroy();
 if(pieChart) pieChart.destroy();
+
+const ctx1=document.getElementById("lineChart");
+const ctx2=document.getElementById("pieChart");
 
 lineChart=new Chart(ctx1,{
 type:"line",
 data:{
 labels:expenses.map(e=>new Date(e.date).toLocaleDateString()),
-datasets:[{label:"Spending",data:expenses.map(e=>e.amount)}]
+datasets:[{
+label:"Spending",
+data:expenses.map(e=>e.amount),
+borderColor:"#38bdf8",
+tension:0.4
+}]
 }
 });
 
@@ -269,19 +256,23 @@ datasets:[{data:Object.values(categoryData)}]
 }
 
 function addDebt(){
-let f=from.value;
-let t=to.value;
-let a=parseFloat(debtAmt.value);
+let f=document.getElementById("from").value;
+let t=document.getElementById("to").value;
+let a=parseFloat(document.getElementById("debtAmt").value);
+
+if(!f||!t||isNaN(a)) return;
+
 debts.push({f,t,a});
 renderDebts();
 }
 
 function renderDebts(){
-debtList.innerHTML="";
+let list=document.getElementById("debtList");
+list.innerHTML="";
 debts.forEach(d=>{
 let li=document.createElement("li");
 li.innerText=`${d.f} → ${d.t} ₹${d.a}`;
-debtList.appendChild(li);
+list.appendChild(li);
 });
 }
 
@@ -311,7 +302,7 @@ c.amt-=settle;
 });
 });
 
-result.innerHTML=output;
+document.getElementById("result").innerHTML=output||"No debts";
 }
 
 render();
